@@ -25,4 +25,10 @@ export const handlers = [
     const data = v.parse(DonationSchema, donation);
     return HttpResponse.json(data);
   }),
+  http.get("https://donations.com.ar/entity/1/donations/get", () => {
+    // TODO: return donations for the entity 1
+  }),
+  http.get("https://donations.com.ar/entity/1/get", () => {
+    // TODO: return the detail information for entity 1
+  }),
 ];
