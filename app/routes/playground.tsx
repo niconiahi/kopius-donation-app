@@ -4,8 +4,11 @@ import {
   useActionData,
   useLoaderData,
   type ActionFunctionArgs,
+  type LinksFunction
 } from "react-router";
+
 import * as v from "valibot";
+
 
 export const NameSchema = v.pipe(v.string(), v.minLength(5));
 export const DonationSchema = v.object({
@@ -59,6 +62,25 @@ export default function () {
   const { donations } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   return (
+  <>
+    <div className="navbar"
+       style={{
+        backgroundColor: '#f8f9fa', 
+        padding: '1rem', 
+        display: 'flex', 
+        alignItems: 'center',
+      }}
+    >
+      <img src="./assets/kopius-star.png" alt="Logo Kopius" 
+      style={{
+          height: '40px',
+        }}/>
+    </div>
+    <div className="information">
+      <h1>Fundacion Si</h1>
+    <img src="./assets/fundacion-si.png" alt="Logo Fundacion Si" />
+    <h2>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Placeat et, consectetur inventore consequuntur adipisci fugiat commodi aut nulla esse ducimus. Sint, quo sunt! Ad saepe tempora maxime sit praesentium porro!</h2>
+    </div>
     <main>
       <ul>
         {donations.map((donation) => {
@@ -74,5 +96,6 @@ export default function () {
         <span>Just created the donation {actionData.name}</span>
       ) : null}
     </main>
-  );
+      </>
+    );
 }
