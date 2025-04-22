@@ -1,0 +1,93 @@
+* {
+  font-family: "Quicksand", sans-serif;
+}
+
+body {
+  background-color: #f5f7fa;
+}
+
+.navbar {
+  background-color: #d7e7ff;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+}
+
+.information .header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.header img {
+  height: 200px;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+.information h2 {
+  align-self: flex-start;
+  text-align: left;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.5;
+}
+
+.information {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 2rem auto;
+}
+
+.information .header h1 {
+  margin: 0;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #2a2a2a;
+  letter-spacing: 2px;
+  line-height: 1.2;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.causes {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.cause-item {
+  padding: 1rem 1.5rem;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  background-color: #fdfdfd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 70%;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.cause-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.logo-kopius {
+  height: 40px;
+  transition: transform 0.2s ease;
+}
+
+.logo-kopius:hover {
+  transform: scale(1.1);
+}
