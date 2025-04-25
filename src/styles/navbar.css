@@ -16,28 +16,13 @@ body {
   border-radius: 12px;
 }
 
-.information .header {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  margin-bottom: 1rem;
+.logo-kopius {
+  height: 40px;
+  transition: transform 0.2s ease;
 }
 
-.header img {
-  height: 200px;
-  border-radius: 16px;
-  object-fit: cover;
-}
-
-.information h2 {
-  align-self: flex-start;
-  text-align: left;
-  margin-left: 2rem;
-  margin-right: 2rem;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #333;
-  line-height: 1.5;
+.logo-kopius:hover {
+  transform: scale(1.1);
 }
 
 .information {
@@ -46,6 +31,21 @@ body {
   align-items: center;
   text-align: center;
   margin: 2rem auto;
+  padding: 1rem;
+}
+
+.information .header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.header img {
+  height: 200px;
+  border-radius: 16px;
+  object-fit: cover;
 }
 
 .information .header h1 {
@@ -58,14 +58,28 @@ body {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.information p {
+  margin-top: 1.5rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  font-size: 1.2rem;
+  font-weight: 550;
+  color: #333;
+  line-height: 1.5;
+  text-align: left;
+  max-width: 1000px;
+}
+
 .causes {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   align-items: center;
+  margin-bottom: 2rem;
 }
 
 .cause-item {
+  font-size: 1.2rem;
   padding: 1rem 1.5rem;
   border: 1px solid #ccc;
   border-radius: 16px;
@@ -76,18 +90,10 @@ body {
   text-decoration: none;
   color: inherit;
   cursor: pointer;
+  text-align: center;
 }
 
 .cause-item:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-}
-
-.logo-kopius {
-  height: 40px;
-  transition: transform 0.2s ease;
-}
-
-.logo-kopius:hover {
-  transform: scale(1.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

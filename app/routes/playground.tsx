@@ -1,4 +1,5 @@
 import {
+  data,
   Form,
   useActionData,
   useLoaderData,
@@ -16,7 +17,20 @@ export const DonationSchema = v.object({
   name: NameSchema,
 });
 export type Donation = v.InferOutput<typeof DonationSchema>;
-
+// ---------------------------
+export const FundationSchema = v.object({
+  id: v.number(),
+  name: v.string(),
+  description: v.string(),
+});
+export type Fundation = v.InferOutput<typeof FundationSchema>;
+// ------------------------------
+export const CausesSchema = v.object({
+  id: v.number(),
+  name: v.string(),
+});
+export type Causes = v.InferOutput<typeof CausesSchema>;
+//-------------------------------
 const ACTION = {
   CREATE_DONATION: "create-donation",
 } as const;
@@ -31,6 +45,30 @@ async function fetchDonations() {
       return donations;
     });
 }
+
+// --------------------------------
+async function fetchFundation() {
+  return fetch("https://donations.com.ar/entity/1/get")
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      const fundation = v.parse(FundationSchema, data);
+      return fundation;
+    });
+}
+// ------------------------------------
+async function fetchCauses() {
+  return fetch("https://donations.com.ar/entity/1/donations/get")
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      const causes = v.parse(v.array(CausesSchema), data);
+      return causes;
+    });
+}
+//-------------------------------------
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -55,11 +93,13 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export async function loader() {
   const donations = await fetchDonations();
-  return { donations };
+  const fundation = await fetchFundation();
+  const causes = await fetchCauses();
+  return { donations, fundation, causes };
 }
 
 export default function () {
-  const { donations } = useLoaderData<typeof loader>();
+  const { donations, fundation, causes } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   return (
     <>
@@ -70,30 +110,23 @@ export default function () {
           alt="Logo Kopius"
         />
       </nav>
-      <div className="information">
+      <div key={`fundation-${fundation.id}`} className="information">
         <div className="header">
           <img src="./assets/logo-small.png" alt="Logo Fundacion Si" />
-          <h1>Fundación Si</h1>
+          <h1>{fundation.name}</h1>
         </div>
-        <h2>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem,
-          inventore suscipit necessitatibus explicabo accusantium alias nesciunt
-          blanditiis quidem ratione nihil, quaerat aut delectus vitae eius,
-          eaque tempore debitis iusto consectetur.
-        </h2>
+        <p>{fundation.description}</p>
       </div>
       <div className="causes">
-        <a href="/pagina1" className="cause-item">
-          <h3>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</h3>
-        </a>
-        <a href="/pagina2" className="cause-item">
-          <h3>Causa ......</h3>
-        </a>
-        <a href="/pagina3" className="cause-item">
-          <h3>Causa....</h3>
-        </a>
+        {causes.map((data) => {
+          return (
+            <div key={`causes-${data.id}`} className="cause-item">
+              {data.name}
+            </div>
+          );
+        })}
       </div>
-      <main>
+      {/* <main>
         <ul>
           {donations.map((donation) => {
             return <li key={`donation-${donation.id}`}>{donation.id}</li>;
@@ -107,7 +140,7 @@ export default function () {
         {actionData ? (
           <span>Just created the donation {actionData.name}</span>
         ) : null}
-      </main>
+      </main> */}
     </>
   );
 }

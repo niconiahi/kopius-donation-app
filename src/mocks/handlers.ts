@@ -1,6 +1,14 @@
 import { http, HttpResponse } from "msw";
 import * as v from "valibot";
-import { DonationSchema, NameSchema, type Donation } from "~/routes/playground";
+import {
+  DonationSchema,
+  FundationSchema,
+  NameSchema,
+  type Donation,
+  type Fundation,
+  type Causes,
+  CausesSchema,
+} from "~/routes/playground";
 
 export const handlers = [
   http.get("https://donations.com.ar/donations", () => {
@@ -27,8 +35,32 @@ export const handlers = [
   }),
   http.get("https://donations.com.ar/entity/1/donations/get", () => {
     // TODO: return donations for the entity 1
+    const causes: Causes[] = [
+      {
+        id: 1,
+        name: "Programa ´Si pueden´",
+      },
+      {
+        id: 2,
+        name: "Residencias Universitarias",
+      },
+      {
+        id: 3,
+        name: "Catastrofes Naturales ",
+      },
+    ];
+    const data = v.parse(v.array(CausesSchema), causes);
+    return HttpResponse.json(data);
   }),
   http.get("https://donations.com.ar/entity/1/get", () => {
     // TODO: return the detail information for entity 1
+    const fundation: Fundation = {
+      id: 1,
+      name: "Fundacion Si",
+      description:
+        "Fundación Sí es una organización sin fines de lucro argentina dedicad a promover la inclusión social de los sectores más vulnerables del país. Desde su creación en 2012 por Manuel Lozano y un grupo de voluntarios, impulsa proyectos solidarios que abarcan áreas como  asistencia, contención, capacitación, educación y cultura del trabajo. Su labor se sostiene gracias al compromiso de miles de voluntarios y donaciones de particulares y empresas, sin que ningún integrante reciba remuneración por su trabajo",
+    };
+    const data = v.parse(FundationSchema, fundation);
+    return HttpResponse.json(data);
   }),
 ];
