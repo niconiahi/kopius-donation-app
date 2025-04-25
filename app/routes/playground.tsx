@@ -17,58 +17,25 @@ export const DonationSchema = v.object({
   name: NameSchema,
 });
 export type Donation = v.InferOutput<typeof DonationSchema>;
-// ---------------------------
+
 export const FundationSchema = v.object({
   id: v.number(),
   name: v.string(),
   description: v.string(),
 });
 export type Fundation = v.InferOutput<typeof FundationSchema>;
-// ------------------------------
+
 export const CausesSchema = v.object({
   id: v.number(),
   name: v.string(),
 });
 export type Causes = v.InferOutput<typeof CausesSchema>;
-//-------------------------------
+
 const ACTION = {
   CREATE_DONATION: "create-donation",
 } as const;
 
-async function fetchDonations() {
-  return fetch("https://donations.com.ar/donations")
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      const donations = v.parse(v.array(DonationSchema), data);
-      return donations;
-    });
-}
 
-// --------------------------------
-async function fetchFundation() {
-  return fetch("https://donations.com.ar/entity/1/get")
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      const fundation = v.parse(FundationSchema, data);
-      return fundation;
-    });
-}
-// ------------------------------------
-async function fetchCauses() {
-  return fetch("https://donations.com.ar/entity/1/donations/get")
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      const causes = v.parse(v.array(CausesSchema), data);
-      return causes;
-    });
-}
-//-------------------------------------
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -143,4 +110,38 @@ export default function () {
       </main> */}
     </>
   );
+}
+
+async function fetchDonations() {
+  return fetch("https://donations.com.ar/donations")
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      const donations = v.parse(v.array(DonationSchema), data);
+      return donations;
+    });
+}
+
+
+async function fetchFundation() {
+  return fetch("https://donations.com.ar/entity/1/get")
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      const fundation = v.parse(FundationSchema, data);
+      return fundation;
+    });
+}
+
+async function fetchCauses() {
+  return fetch("https://donations.com.ar/entity/1/donations/get")
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      const causes = v.parse(v.array(CausesSchema), data);
+      return causes;
+    });
 }

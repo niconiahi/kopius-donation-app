@@ -34,7 +34,6 @@ export const handlers = [
     return HttpResponse.json(data);
   }),
   http.get("https://donations.com.ar/entity/1/donations/get", () => {
-    // TODO: return donations for the entity 1
     const causes: Causes[] = [
       {
         id: 1,
@@ -53,7 +52,6 @@ export const handlers = [
     return HttpResponse.json(data);
   }),
   http.get("https://donations.com.ar/entity/1/get", () => {
-    // TODO: return the detail information for entity 1
     const fundation: Fundation = {
       id: 1,
       name: "Fundacion Si",
