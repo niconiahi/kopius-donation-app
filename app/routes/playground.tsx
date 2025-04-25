@@ -1,6 +1,7 @@
 import {
   data,
   Form,
+  redirect,
   useActionData,
   useLoaderData,
   type ActionFunctionArgs,
@@ -8,7 +9,7 @@ import {
 } from "react-router";
 
 import * as v from "valibot";
-import styles from "src/styles/navbar.css?url";
+import styles from "src/styles/global.css?url";
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
 export const NameSchema = v.pipe(v.string(), v.minLength(5));
@@ -28,35 +29,41 @@ export type Fundation = v.InferOutput<typeof FundationSchema>;
 export const CausesSchema = v.object({
   id: v.number(),
   name: v.string(),
+  description:v.string()
 });
 export type Causes = v.InferOutput<typeof CausesSchema>;
 
+
+
 const ACTION = {
-  CREATE_DONATION: "create-donation",
-} as const;
+    CREATE_DONATION: "create-donation",
+    DONATE_1K:"donate-1k",
+    DONATE_3K:"donate-3k",
+    DONATE_5K:"donate-5k",
+    DONATE_10k:"donate-10k"
+  } as const;
 
-
-
-export async function action({ request }: ActionFunctionArgs) {
-  const formData = await request.formData();
-  const action = formData.get("action");
-  switch (action) {
-    case ACTION.CREATE_DONATION: {
-      const donation = await fetch("https://donations.com.ar/donation/create", {
-        method: "POST",
-        body: formData,
-      })
-        .then((response) => {
-          return response.json();
+  export async function action({ request }: ActionFunctionArgs) {
+    const formData = await request.formData();
+    const action = formData.get("action");
+    switch (action) {
+      case ACTION.CREATE_DONATION: {
+        const donation = await fetch("https://donations.com.ar/donation/create", {
+          method: "POST",
+          body: formData,
         })
-        .then((data) => {
-          const donation = v.parse(DonationSchema, data);
-          return donation;
-        });
-      return donation;
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            const donation = v.parse(DonationSchema, data);
+            return donation;
+          });
+        return donation;
+      }
     }
   }
-}
+
 
 export async function loader() {
   const donations = await fetchDonations();
@@ -88,29 +95,32 @@ export default function () {
         {causes.map((data) => {
           return (
             <div key={`causes-${data.id}`} className="cause-item">
-              {data.name}
+              <b>{data.name}</b>
+              <p>{data.description}</p>
+              <Form method="POST" className="donation-form">
+                <input type="hidden" value={ACTION.DONATE_1K} name="action"/>
+                <button className="donation-button" name="amount" value="1000">$1000</button>
+
+                <input type="hidden" value={ACTION.DONATE_3K} name="action" />
+                <button className="donation-button" name="amount" value="3000">$3000</button>
+
+                <input type="hidden" value={ACTION.DONATE_5K} name="action" />
+                <button className="donation-button" name="amount" value="5000">$5000</button>
+
+                <input type="hidden" value={ACTION.DONATE_10k} name="action"/>
+                <button className="donation-button" name="amount" value="10000">$10.000</button>
+              </Form>
             </div>
           );
         })}
       </div>
-      {/* <main>
-        <ul>
-          {donations.map((donation) => {
-            return <li key={`donation-${donation.id}`}>{donation.id}</li>;
-          })}
-        </ul>
-        <Form method="POST">
-          <input type="hidden" name="action" value={ACTION.CREATE_DONATION} />
-          <input name="name" />
-          <button type="submit">Create donation</button>
-        </Form>
-        {actionData ? (
-          <span>Just created the donation {actionData.name}</span>
-        ) : null}
-      </main> */}
+        <main>
+        
+        </main>  
     </>
   );
 }
+
 
 async function fetchDonations() {
   return fetch("https://donations.com.ar/donations")
@@ -122,7 +132,6 @@ async function fetchDonations() {
       return donations;
     });
 }
-
 
 async function fetchFundation() {
   return fetch("https://donations.com.ar/entity/1/get")

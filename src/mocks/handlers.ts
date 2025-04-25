@@ -38,14 +38,17 @@ export const handlers = [
       {
         id: 1,
         name: "Programa ´Si pueden´",
+        description:'Brinda alimentos a personas en situación de vulnerabilidad'
       },
       {
         id: 2,
         name: "Residencias Universitarias",
+        description:'Ofrece alojamiento a estudiantes con recursos limitados.'
       },
       {
         id: 3,
         name: "Catastrofes Naturales ",
+        description: 'Responde con ayuda urgente ante emergencias como inundaciones o terremotos.'
       },
     ];
     const data = v.parse(v.array(CausesSchema), causes);
@@ -60,5 +63,42 @@ export const handlers = [
     };
     const data = v.parse(FundationSchema, fundation);
     return HttpResponse.json(data);
+  }),
+  http.post("https://api.mercadopago.com/checkout/preferences", () => {
+   const preferences=[{
+    items: [
+      {
+        id: 1,
+        title: "$1000",
+        quantity: 1,
+        unit_price: 1000
+      },
+      {
+        id: 2,
+        title: "$3000",
+        quantity: 1,
+        unit_price: 3000
+      },
+      {
+        id: 2,
+        title: "$5000",
+        quantity: 1,
+        unit_price: 5000
+      },
+      {
+        id: 3,
+        title: "$10.000",
+        quantity: 1,
+        unit_price: 10000
+      }
+
+    ],
+    back_urls: {
+      success: "https://test.com/success",
+      pending: "https://test.com/pending",
+      failure: "https://test.com/failure"
+    },
+   }]
+   return HttpResponse.json(preferences);
   }),
 ];
