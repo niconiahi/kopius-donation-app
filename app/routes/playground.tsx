@@ -7,9 +7,12 @@ import {
   type ActionFunctionArgs,
   type LinksFunction,
 } from "react-router";
-
+import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 import * as v from "valibot";
 import styles from "src/styles/global.css?url";
+
+initMercadoPago("TEST-c82e5505-3f42-4d4f-9b3d-f32246048daf");
+
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
 export const NameSchema = v.pipe(v.string(), v.minLength(5));
@@ -29,41 +32,66 @@ export type Fundation = v.InferOutput<typeof FundationSchema>;
 export const CausesSchema = v.object({
   id: v.number(),
   name: v.string(),
-  description:v.string()
+  description: v.string(),
 });
 export type Causes = v.InferOutput<typeof CausesSchema>;
 
-
-
 const ACTION = {
-    CREATE_DONATION: "create-donation",
-    DONATE_1K:"donate-1k",
-    DONATE_3K:"donate-3k",
-    DONATE_5K:"donate-5k",
-    DONATE_10k:"donate-10k"
-  } as const;
+  CREATE_DONATION: "create-donation",
+  DONATE_1K: "donate-1k",
+  DONATE_3K: "donate-3k",
+  DONATE_5K: "donate-5k",
+  DONATE_10k: "donate-10k",
+} as const;
 
-  export async function action({ request }: ActionFunctionArgs) {
-    const formData = await request.formData();
-    const action = formData.get("action");
-    switch (action) {
-      case ACTION.CREATE_DONATION: {
-        const donation = await fetch("https://donations.com.ar/donation/create", {
-          method: "POST",
-          body: formData,
-        })
-          .then((response) => {
-            return response.json();
-          })
-          .then((data) => {
-            const donation = v.parse(DonationSchema, data);
-            return donation;
-          });
-        return donation;
-      }
-    }
+function getAmountByAction(action: FormDataEntryValue | null) {
+  switch (action) {
+    case ACTION.DONATE_1K:
+      return 1000;
+    case ACTION.DONATE_3K:
+      return 3000;
+    case ACTION.DONATE_5K:
+      return 5000;
+    case ACTION.DONATE_10k:
+      return 10000;
   }
+}
 
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const action = formData.get("action");
+  const value = getAmountByAction(action);
+  const preferences = await fetch(
+    "https://api.mercadopago.com/checkout/preferences",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "Bearer TEST-441491382271261-042511-f6094ffb0b9fd2f965a59c191dd93a09-660855927",
+      },
+      body: JSON.stringify({
+        items: [
+          {
+            id: 1,
+            title: "${value}",
+            quantity: 1,
+            unit_price: value,
+          },
+        ],
+        back_urls: {
+          success: "https://test.com/success",
+          pending: "https://test.com/pending",
+          failure: "https://test.com/failure",
+        },
+        auto_return: "approved",
+      }),
+    },
+  ).then((response) => {
+    return response.json();
+  });
+  throw redirect(preferences.init_point);
+}
 
 export async function loader() {
   const donations = await fetchDonations();
@@ -98,29 +126,33 @@ export default function () {
               <b>{data.name}</b>
               <p>{data.description}</p>
               <Form method="POST" className="donation-form">
-                <input type="hidden" value={ACTION.DONATE_1K} name="action"/>
-                <button className="donation-button" name="amount" value="1000">$1000</button>
+                <input type="hidden" value={ACTION.DONATE_1K} name="action" />
+                <button type="submit" className="donation-button">
+                  $1000
+                </button>
 
                 <input type="hidden" value={ACTION.DONATE_3K} name="action" />
-                <button className="donation-button" name="amount" value="3000">$3000</button>
+                <button type="submit" className="donation-button">
+                  $3000
+                </button>
 
                 <input type="hidden" value={ACTION.DONATE_5K} name="action" />
-                <button className="donation-button" name="amount" value="5000">$5000</button>
+                <button type="submit" className="donation-button">
+                  $5000
+                </button>
 
-                <input type="hidden" value={ACTION.DONATE_10k} name="action"/>
-                <button className="donation-button" name="amount" value="10000">$10.000</button>
+                <input type="hidden" value={ACTION.DONATE_10k} name="action" />
+                <button type="submit" className="donation-button">
+                  $10.000
+                </button>
               </Form>
             </div>
           );
         })}
       </div>
-        <main>
-        
-        </main>  
     </>
   );
 }
-
 
 async function fetchDonations() {
   return fetch("https://donations.com.ar/donations")

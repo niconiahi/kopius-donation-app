@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@mercadopago/sdk-react':
+        specifier: ^1.0.2
+        version: 1.0.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@react-router/node':
         specifier: ^7.3.0
         version: 7.5.1(react-router@7.5.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(typescript@5.8.3)
@@ -528,6 +531,15 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
+
+  '@mercadopago/sdk-js@0.0.3':
+    resolution: {integrity: sha512-kO48DNLHdfFAp3on12nuKdqNlEmw1x3+nM6wLd04BdWOXoFcAhkNMQV3AyUIanXdO/bB/dENakdacLT29297EQ==}
+
+  '@mercadopago/sdk-react@1.0.2':
+    resolution: {integrity: sha512-EZa1Jj9RChp4wZxTKHHgF/4zVzgkyGwo8UUYtLveBrVeUcbRK+Nu1aZXgfL2hQeQIGA/nlk1sHtWqMC2f8cMzQ==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   '@mjackson/node-fetch-server@0.2.0':
     resolution: {integrity: sha512-EMlH1e30yzmTpGLQjlFmaDAjyOeZhng1/XCd7DExR8PNAnG/G1tyruZxEoUe11ClnwGhGrtsdnyyUx1frSzjng==}
@@ -3000,6 +3012,14 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
+
+  '@mercadopago/sdk-js@0.0.3': {}
+
+  '@mercadopago/sdk-react@1.0.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@mercadopago/sdk-js': 0.0.3
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
 
   '@mjackson/node-fetch-server@0.2.0': {}
 
