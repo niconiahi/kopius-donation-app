@@ -2,7 +2,6 @@ import {
   data,
   Form,
   redirect,
-  useActionData,
   useLoaderData,
   type ActionFunctionArgs,
   type LinksFunction,
@@ -38,71 +37,57 @@ export type Causes = v.InferOutput<typeof CausesSchema>;
 
 const ACTION = {
   CREATE_DONATION: "create-donation",
-  DONATE_1K: "donate-1k",
-  DONATE_3K: "donate-3k",
-  DONATE_5K: "donate-5k",
-  DONATE_10k: "donate-10k",
+  DONATE: "donate",
 } as const;
-
-function getAmountByAction(action: FormDataEntryValue | null) {
-  switch (action) {
-    case ACTION.DONATE_1K:
-      return 1000;
-    case ACTION.DONATE_3K:
-      return 3000;
-    case ACTION.DONATE_5K:
-      return 5000;
-    case ACTION.DONATE_10k:
-      return 10000;
-  }
-}
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const action = formData.get("action");
-  const value = getAmountByAction(action);
-  const preferences = await fetch(
-    "https://api.mercadopago.com/checkout/preferences",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization:
-          "Bearer TEST-441491382271261-042511-f6094ffb0b9fd2f965a59c191dd93a09-660855927",
-      },
-      body: JSON.stringify({
-        items: [
-          {
-            id: 1,
-            title: "${value}",
-            quantity: 1,
-            unit_price: value,
+  const amount = Number(formData.get("amount"));
+  switch (action) {
+    case ACTION.DONATE: {
+      const preferences = await fetch(
+        "https://api.mercadopago.com/checkout/preferences",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization:
+              "Bearer TEST-441491382271261-042511-f6094ffb0b9fd2f965a59c191dd93a09-660855927",
           },
-        ],
-        back_urls: {
-          success: "https://test.com/success",
-          pending: "https://test.com/pending",
-          failure: "https://test.com/failure",
+          body: JSON.stringify({
+            items: [
+              {
+                title: "Monto",
+                quantity: 1,
+                unit_price: amount,
+              },
+            ],
+
+            back_urls: {
+              success: "http://localhost:5173/success",
+              pending: "https://test.com/pending",
+              failure: "https://test.com/failure",
+            },
+            auto_return: "approved",
+          }),
         },
-        auto_return: "approved",
-      }),
-    },
-  ).then((response) => {
-    return response.json();
-  });
-  throw redirect(preferences.init_point);
+      ).then((response) => {
+        return response.json();
+      });
+      throw redirect(preferences.init_point);
+    }
+  }
 }
 
 export async function loader() {
-  const donations = await fetchDonations();
   const fundation = await fetchFundation();
   const causes = await fetchCauses();
-  return { donations, fundation, causes };
+  return { fundation, causes };
 }
 
 export default function () {
-  const { donations, fundation, causes } = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
+  const { fundation, causes } = useLoaderData<typeof loader>();
   return (
     <>
       <nav className="navbar">
@@ -125,44 +110,46 @@ export default function () {
             <div key={`causes-${data.id}`} className="cause-item">
               <b>{data.name}</b>
               <p>{data.description}</p>
-              <Form method="POST" className="donation-form">
-                <input type="hidden" value={ACTION.DONATE_1K} name="action" />
-                <button type="submit" className="donation-button">
-                  $1000
-                </button>
 
-                <input type="hidden" value={ACTION.DONATE_3K} name="action" />
-                <button type="submit" className="donation-button">
-                  $3000
-                </button>
+              <div className="donation-form">
+                <Form method="POST">
+                  <input type="hidden" value={1000} name="amount" />
+                  <input type="hidden" value={ACTION.DONATE} name="action" />
+                  <button type="submit" className="donation-button">
+                    $1000
+                  </button>
+                </Form>
 
-                <input type="hidden" value={ACTION.DONATE_5K} name="action" />
-                <button type="submit" className="donation-button">
-                  $5000
-                </button>
+                <Form method="POST">
+                  <input type="hidden" value={3000} name="amount" />
+                  <input type="hidden" value={ACTION.DONATE} name="action" />
+                  <button type="submit" className="donation-button">
+                    $3000
+                  </button>
+                </Form>
 
-                <input type="hidden" value={ACTION.DONATE_10k} name="action" />
-                <button type="submit" className="donation-button">
-                  $10.000
-                </button>
-              </Form>
+                <Form method="POST">
+                  <input type="hidden" value={5000} name="amount" />
+                  <input type="hidden" value={ACTION.DONATE} name="action" />
+                  <button type="submit" className="donation-button">
+                    $5000
+                  </button>
+                </Form>
+
+                <Form method="POST">
+                  <input type="hidden" value={10000} name="amount" />
+                  <input type="hidden" value={ACTION.DONATE} name="action" />
+                  <button type="submit" className="donation-button">
+                    $10.000
+                  </button>
+                </Form>
+              </div>
             </div>
           );
         })}
       </div>
     </>
   );
-}
-
-async function fetchDonations() {
-  return fetch("https://donations.com.ar/donations")
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      const donations = v.parse(v.array(DonationSchema), data);
-      return donations;
-    });
 }
 
 async function fetchFundation() {
