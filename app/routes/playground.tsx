@@ -1,12 +1,11 @@
 import {
-  data,
   Form,
   redirect,
   useLoaderData,
   type ActionFunctionArgs,
   type LinksFunction,
 } from "react-router";
-import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
+import { initMercadoPago } from "@mercadopago/sdk-react";
 import * as v from "valibot";
 import styles from "src/styles/global.css?url";
 
@@ -44,6 +43,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const action = formData.get("action");
   const amount = Number(formData.get("amount"));
+  const cause= formData.get("cause")
   switch (action) {
     case ACTION.DONATE: {
       const preferences = await fetch(
@@ -58,14 +58,14 @@ export async function action({ request }: ActionFunctionArgs) {
           body: JSON.stringify({
             items: [
               {
-                title: "Monto",
+                title: cause,
                 quantity: 1,
                 unit_price: amount,
               },
             ],
 
             back_urls: {
-              success: "http://localhost:5173/success",
+              success: "https://test.com/success",
               pending: "https://test.com/pending",
               failure: "https://test.com/failure",
             },
@@ -114,32 +114,36 @@ export default function () {
               <div className="donation-form">
                 <Form method="POST">
                   <input type="hidden" value={1000} name="amount" />
+                  <input type="hidden" value={data.name} name="cause" />
                   <input type="hidden" value={ACTION.DONATE} name="action" />
-                  <button type="submit" className="donation-button">
+                  <button type="submit" className="button">
                     $1000
                   </button>
                 </Form>
 
                 <Form method="POST">
                   <input type="hidden" value={3000} name="amount" />
+                  <input type="hidden" value={data.name} name="cause" />
                   <input type="hidden" value={ACTION.DONATE} name="action" />
-                  <button type="submit" className="donation-button">
+                  <button type="submit" className="button">
                     $3000
                   </button>
                 </Form>
 
                 <Form method="POST">
                   <input type="hidden" value={5000} name="amount" />
+                  <input type="hidden" value={data.name} name="cause" />
                   <input type="hidden" value={ACTION.DONATE} name="action" />
-                  <button type="submit" className="donation-button">
+                  <button type="submit" className="button">
                     $5000
                   </button>
                 </Form>
 
                 <Form method="POST">
                   <input type="hidden" value={10000} name="amount" />
+                  <input type="hidden" value={data.name} name="cause" />
                   <input type="hidden" value={ACTION.DONATE} name="action" />
-                  <button type="submit" className="donation-button">
+                  <button type="submit" className="button">
                     $10.000
                   </button>
                 </Form>
