@@ -63,7 +63,6 @@ export async function action({ request }: ActionFunctionArgs) {
                 unit_price: amount,
               },
             ],
-
             back_urls: {
               success: "https://test.com/success",
               pending: "https://test.com/pending",
