@@ -64,9 +64,9 @@ export async function action({ request }: ActionFunctionArgs) {
               },
             ],
             back_urls: {
-              success: "https://test.com/success",
-              pending: "https://test.com/pending",
-              failure: "https://test.com/failure",
+              success: "https://mydomain.com/success",
+              pending: "https://mydomain.com/pending",
+              failure: "https://mydomain.com/failure",
             },
             auto_return: "approved",
           }),
@@ -175,4 +175,67 @@ async function fetchCauses() {
       const causes = v.parse(v.array(CausesSchema), data);
       return causes;
     });
+}
+
+
+
+
+async function conectApp(){
+  return await fetch("https://api.cloudflare.com/client/v4/accounts/6ce8a76fe4bc2ae4d707822b583ed684/cfd_tunnel/c1744f8b-faa1-48a4-9e5c-02ac921467fa/configurations",{
+    method:"POST",
+    headers:{
+      Authorization: "Bearer JWyox9kidjjUKSUZJOQHAE6CSFoqHgUu36-kTdjv" ,
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+        config: {
+          ingress: [
+            {
+              hostname: "mydomain.com",
+              service: "http://localhost:5173/",
+              originRequest: {}
+            },
+            {
+              hostname: "mydomain.com",
+              path: "/success",
+              service: "http://localhost:5173/success",
+              originRequest: {}
+            },
+            {
+              hostname: "mydomain.com",
+              path: "/pending",
+              service: "http://localhost:5173/pending",
+              originRequest: {}
+            },
+            {
+              hostname: "mydomain.com",
+              path: "/failure",
+              service: "http://localhost:5173/failure",
+              originRequest: {}
+            },
+            {
+              service: "http_status:404"
+            }
+          ]
+        }
+    })
+  })
+  .then((response)=>{
+    return response.json()
+  })
+}
+
+async function DNS() {
+  return await fetch("https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records", {
+    method:"POST",
+    headers: {
+     Authorization: "Bearer JWyox9kidjjUKSUZJOQHAE6CSFoqHgUu36-kTdjv"
+    },
+    body:JSON.stringify({
+      type: "CNAME",
+      proxied: true,
+      name: "mydomain.com",
+      content: "c1744f8b-faa1-48a4-9e5c-02ac921467fa.cfargotunnel.com"
+    })
+  })
 }
