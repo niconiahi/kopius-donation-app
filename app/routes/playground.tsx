@@ -1,5 +1,6 @@
 import {
   Form,
+  redirect,
   useActionData,
   useLoaderData,
   type ActionFunctionArgs,
@@ -36,6 +37,7 @@ export type Entity = v.InferOutput<typeof EntitySchema>;
 
 const ACTION = {
   CREATE_DONATION: "create-donation",
+  PAY_DONATION: "pay_donation",
 } as const;
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -56,6 +58,53 @@ export async function action({ request }: ActionFunctionArgs) {
         });
       return donation;
     }
+
+    case ACTION.PAY_DONATION: {
+      const amount = v.parse(
+        v.pipe(
+          v.string(),
+          v.transform((input) => {
+            return Number(input);
+          }),
+        ),
+        formData.get("amount"),
+      );
+      const name = v.parse(v.string(), formData.get("name"));
+      console.log("amount", amount);
+      console.log("name", name);
+      const mercadoPago = await fetch(
+        "https://api.mercadopago.com/checkout/preferences",
+        {
+          method: "POST",
+          headers: {
+            Authorization:
+              "Bearer TEST-4898188942735923-042908-f6d36dbbf769f319dea2a3a3a3086d81-441865369",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            items: [
+              {
+                title: name,
+                quantity: 1,
+                unit_price: amount,
+              },
+            ],
+            back_urls: {
+              success: "https://test.com/success",
+              pending: "https://test.com/pending",
+              failure: "https://test.com/failure",
+            },
+          }),
+        },
+      )
+        .then((response) => {
+          return response.json();
+        })
+        .catch((error) => {
+          console.log("error", error);
+        });
+      throw redirect(mercadoPago.sandbox_init_point);
+    }
   }
 }
 
@@ -71,44 +120,109 @@ export default function () {
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   return (
-    <body className="body">
-      <nav>
+    <body className="body container">
+      <nav className="navbar">
         <img
           src="public/assets/RGB_symbol gradient.png"
           alt="Logo de Kopius"
-          className="logo"
+          className="logo navbar-logo"
         />
       </nav>
-      <div className="information">
-        <div className="header">
-          <img src="assets/logo-small.png" alt="Imagen de Fundacion si" />
+      <div className="information card">
+        <div className="header entity-header">
+          <img
+            src="assets/logo-small.png"
+            alt="Imagen de Fundacion si"
+            className="entity-logo"
+          />
           <h2>{entityDetails.name}</h2>
           <p>{entityDetails.description}</p>
         </div>
       </div>
-      <ul>
+      <ul className="donation-options">
         {donationOptions.map((option) => {
           return (
-            <li key={`donation-Option-${option.id}`} className="subtitulo">
-              {option.name}
-              <p>{option.description}</p>
-            </li>
+            <div
+              key={`donation-Option-${option.id}`}
+              className="donation-option"
+            >
+              <li className="subtitulo option-title">
+                {option.name}
+                <p>{option.description}</p>
+              </li>
+              <Form method="POST" className="donation-form">
+                <input
+                  type="hidden"
+                  name="action"
+                  value={ACTION.PAY_DONATION}
+                />
+                <input type="hidden" name="name" value={option.name} />
+                <input type="hidden" value={1000} name="amount" />
+                <button type="submit" className="donation-button">
+                  1000
+                </button>
+              </Form>
+              <Form method="POST" className="donation-form">
+                <input
+                  type="hidden"
+                  name="action"
+                  value={ACTION.PAY_DONATION}
+                />
+                <input type="hidden" name="name" value={option.name} />
+                <input type="hidden" value={2000} name="amount" />
+                <button type="submit" className="donation-button">
+                  2000
+                </button>
+              </Form>
+              <Form method="POST" className="donation-form">
+                <input
+                  type="hidden"
+                  name="action"
+                  value={ACTION.PAY_DONATION}
+                />
+                <input type="hidden" name="name" value={option.name} />
+                <input type="hidden" value={5000} name="amount" />
+                <button type="submit" className="donation-button">
+                  5000
+                </button>
+              </Form>
+              <Form method="POST" className="donation-form">
+                <input
+                  type="hidden"
+                  name="action"
+                  value={ACTION.PAY_DONATION}
+                />
+                <input type="hidden" name="name" value={option.name} />
+                <input type="hidden" value={10000} name="amount" />
+                <button type="submit" className="donation-button">
+                  10000
+                </button>
+              </Form>
+            </div>
           );
         })}
       </ul>
-      <main>
-        <ul>
+      <main className="main">
+        <ul className="donations-list">
           {donations.map((donation) => {
-            return <li key={`donation-${donation.id}`}>{donation.id}</li>;
+            return (
+              <li key={`donation-${donation.id}`} className="donation-item">
+                {donation.id}
+              </li>
+            );
           })}
         </ul>
-        <Form method="POST">
+        <Form method="POST" className="create-donation-form">
           <input type="hidden" name="action" value={ACTION.CREATE_DONATION} />
-          <input name="name" />
-          <button type="submit">Create donation</button>
+          <input name="name" className="input-name" />
+          <button type="submit" className="create-button">
+            Create donation
+          </button>
         </Form>
         {actionData ? (
-          <span>Just created the donation {actionData.name}</span>
+          <span className="success-message">
+            Just created the donation {actionData.name}
+          </span>
         ) : null}
       </main>
     </body>
@@ -135,6 +249,23 @@ async function fetchDonationOptions() {
       const donationOption = v.parse(v.array(DonationOptionsSchema), data);
       return donationOption;
     });
+}
+
+async function connectCloudflare() {
+  await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${accountId}/cfd_tunnel`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiToken}`,
+      },
+      body: JSON.stringify({
+        name: "api-tunnel",
+        config_src: "cloudflare",
+      }),
+    },
+  );
 }
 
 async function fetchDonations() {

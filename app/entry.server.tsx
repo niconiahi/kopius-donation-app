@@ -1,5 +1,7 @@
 import { server } from "../src/mocks/node";
-server.listen();
+server.listen({
+  onUnhandledRequest: "bypass",
+});
 
 import { PassThrough } from "node:stream";
 
