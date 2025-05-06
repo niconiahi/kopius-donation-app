@@ -4,7 +4,7 @@ import { HydratedRouter } from "react-router/dom";
 
 async function enableMocking() {
   if (process.env.NODE_ENV !== "development") return;
-  const { worker } = await import("../src/mocks/browser");
+  const { worker } = await import("~/mocks/browser");
   console.info("Starting MSW service worker…");
   await worker.start();
 }

@@ -7,7 +7,7 @@ import {
 } from "react-router";
 import { initMercadoPago } from "@mercadopago/sdk-react";
 import * as v from "valibot";
-import styles from "src/styles/global.css?url";
+import styles from "~/styles/global.css?url";
 
 initMercadoPago("TEST-c82e5505-3f42-4d4f-9b3d-f32246048daf");
 
@@ -74,85 +74,91 @@ export async function action({ request }: ActionFunctionArgs) {
       ).then((response) => {
         return response.json();
       });
-      throw redirect(preferences.init_point);
+      throw redirect((preferences as any).init_point as any);
     }
   }
 }
 
 export async function loader() {
-  const fundation = await fetchFundation();
-  const causes = await fetchCauses();
-  return { fundation, causes };
+  // const fundation = await fetchFundation();
+  // const causes = await fetchCauses();
+  // return { fundation, causes };
+  const data= await fetch("http://localhost:5173/test").then((response)=> response.json())
+  console.log("DATA",data)
+  return null
 }
 
 export default function () {
-  const { fundation, causes } = useLoaderData<typeof loader>();
   return (
-    <>
-      <nav className="navbar">
-        <img
-          className="logo-kopius"
-          src="./assets/symbol_gradient.png"
-          alt="Logo Kopius"
-        />
-      </nav>
-      <div key={`fundation-${fundation.id}`} className="information">
-        <div className="header">
-          <img src="./assets/logo-small.png" alt="Logo Fundacion Si" />
-          <h1>{fundation.name}</h1>
-        </div>
-        <p>{fundation.description}</p>
-      </div>
-      <div className="causes">
-        {causes.map((data) => {
-          return (
-            <div key={`causes-${data.id}`} className="cause-item">
-              <b>{data.name}</b>
-              <p>{data.description}</p>
+    <h1>HOLA</h1>
+  )
+  // const { fundation, causes } = useLoaderData<typeof loader>();
+  // return (
+  //   <>
+  //     <nav className="navbar">
+  //       <img
+  //         className="logo-kopius"
+  //         src="./assets/symbol_gradient.png"
+  //         alt="Logo Kopius"
+  //       />
+  //     </nav>
+  //     <div key={`fundation-${fundation.id}`} className="information">
+  //       <div className="header">
+  //         <img src="./assets/logo-small.png" alt="Logo Fundacion Si" />
+  //         <h1>{fundation.name}</h1>
+  //       </div>
+  //       <p>{fundation.description}</p>
+  //     </div>
+  //     <div className="causes">
+  //       {causes.map((data) => {
+  //         return (
+  //           <div key={`causes-${data.id}`} className="cause-item">
+  //             <b>{data.name}</b>
+  //             <p>{data.description}</p>
 
-              <div className="donation-form">
-                <Form method="POST">
-                  <input type="hidden" value={1000} name="amount" />
-                  <input type="hidden" value={data.name} name="cause" />
-                  <input type="hidden" value={ACTION.DONATE} name="action" />
-                  <button type="submit" className="button">
-                    $1000
-                  </button>
-                </Form>
+  //             <div className="donation-form">
+  //               <Form method="POST">
+  //                 <input type="hidden" value={1000} name="amount" />
+  //                 <input type="hidden" value={data.name} name="cause" />
+  //                 <input type="hidden" value={ACTION.DONATE} name="action" />
+  //                 <button type="submit" className="button">
+  //                   $1000
+  //                 </button>
+  //               </Form>
 
-                <Form method="POST">
-                  <input type="hidden" value={3000} name="amount" />
-                  <input type="hidden" value={data.name} name="cause" />
-                  <input type="hidden" value={ACTION.DONATE} name="action" />
-                  <button type="submit" className="button">
-                    $3000
-                  </button>
-                </Form>
+  //               <Form method="POST">
+  //                 <input type="hidden" value={3000} name="amount" />
+  //                 <input type="hidden" value={data.name} name="cause" />
+  //                 <input type="hidden" value={ACTION.DONATE} name="action" />
+  //                 <button type="submit" className="button">
+  //                   $3000
+  //                 </button>
+  //               </Form>
 
-                <Form method="POST">
-                  <input type="hidden" value={5000} name="amount" />
-                  <input type="hidden" value={data.name} name="cause" />
-                  <input type="hidden" value={ACTION.DONATE} name="action" />
-                  <button type="submit" className="button">
-                    $5000
-                  </button>
-                </Form>
+  //               <Form method="POST">
+  //                 <input type="hidden" value={5000} name="amount" />
+  //                 <input type="hidden" value={data.name} name="cause" />
+  //                 <input type="hidden" value={ACTION.DONATE} name="action" />
+  //                 <button type="submit" className="button">
+  //                   $5000
+  //                 </button>
+  //               </Form>
 
-                <Form method="POST">
-                  <input type="hidden" value={10000} name="amount" />
-                  <input type="hidden" value={data.name} name="cause" />
-                  <input type="hidden" value={ACTION.DONATE} name="action" />
-                  <button type="submit" className="button">
-                    $10.000
-                  </button>
-                </Form>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </>
-  );
+  //               <Form method="POST">
+  //                 <input type="hidden" value={10000} name="amount" />
+  //                 <input type="hidden" value={data.name} name="cause" />
+  //                 <input type="hidden" value={ACTION.DONATE} name="action" />
+  //                 <button type="submit" className="button">
+  //                   $10.000
+  //                 </button>
+  //               </Form>
+  //             </div>
+  //           </div>
+  //         );
+  //       })}
+  //     </div>
+  //   </>
+  // );
 }
 
 async function fetchFundation() {
@@ -180,62 +186,3 @@ async function fetchCauses() {
 
 
 
-async function conectApp(){
-  return await fetch("https://api.cloudflare.com/client/v4/accounts/6ce8a76fe4bc2ae4d707822b583ed684/cfd_tunnel/c1744f8b-faa1-48a4-9e5c-02ac921467fa/configurations",{
-    method:"POST",
-    headers:{
-      Authorization: "Bearer JWyox9kidjjUKSUZJOQHAE6CSFoqHgUu36-kTdjv" ,
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-        config: {
-          ingress: [
-            {
-              hostname: "mydomain.com",
-              service: "http://localhost:5173/",
-              originRequest: {}
-            },
-            {
-              hostname: "mydomain.com",
-              path: "/success",
-              service: "http://localhost:5173/success",
-              originRequest: {}
-            },
-            {
-              hostname: "mydomain.com",
-              path: "/pending",
-              service: "http://localhost:5173/pending",
-              originRequest: {}
-            },
-            {
-              hostname: "mydomain.com",
-              path: "/failure",
-              service: "http://localhost:5173/failure",
-              originRequest: {}
-            },
-            {
-              service: "http_status:404"
-            }
-          ]
-        }
-    })
-  })
-  .then((response)=>{
-    return response.json()
-  })
-}
-
-async function DNS() {
-  return await fetch("https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records", {
-    method:"POST",
-    headers: {
-     Authorization: "Bearer JWyox9kidjjUKSUZJOQHAE6CSFoqHgUu36-kTdjv"
-    },
-    body:JSON.stringify({
-      type: "CNAME",
-      proxied: true,
-      name: "mydomain.com",
-      content: "c1744f8b-faa1-48a4-9e5c-02ac921467fa.cfargotunnel.com"
-    })
-  })
-}

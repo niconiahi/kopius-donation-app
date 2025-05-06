@@ -8,7 +8,8 @@ import {
   type Fundation,
   type Causes,
   CausesSchema,
-} from "~/routes/playground";
+} from "../routes/playground";
+
 
 export const handlers = [
   http.get("https://donations.com.ar/donations", () => {
@@ -65,5 +66,10 @@ export const handlers = [
     };
     const data = v.parse(FundationSchema, fundation);
     return HttpResponse.json(data);
+  }),
+  http.get('http://localhost:5173/test', (req, res, ctx) => {
+    return HttpResponse.json({
+      id:1
+    }) 
   }),
 ];
