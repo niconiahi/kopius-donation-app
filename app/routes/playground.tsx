@@ -230,7 +230,7 @@ export default function () {
 }
 
 async function fetchEntityDetails() {
-  return fetch("https://donations.com.ar/entity/1/get")
+  return fetch("http://localhost:5173/entity/1/get")
     .then((response) => {
       return response.json();
     })
@@ -249,23 +249,6 @@ async function fetchDonationOptions() {
       const donationOption = v.parse(v.array(DonationOptionsSchema), data);
       return donationOption;
     });
-}
-
-async function connectCloudflare() {
-  await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/cfd_tunnel`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiToken}`,
-      },
-      body: JSON.stringify({
-        name: "api-tunnel",
-        config_src: "cloudflare",
-      }),
-    },
-  );
 }
 
 async function fetchDonations() {
