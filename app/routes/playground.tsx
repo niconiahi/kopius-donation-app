@@ -4,6 +4,7 @@ import {
   useLoaderData,
   type ActionFunctionArgs,
   type LinksFunction,
+  type LoaderFunctionArgs,
 } from "react-router";
 import { initMercadoPago } from "@mercadopago/sdk-react";
 import * as v from "valibot";
@@ -13,12 +14,6 @@ initMercadoPago("TEST-c82e5505-3f42-4d4f-9b3d-f32246048daf");
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
-export const NameSchema = v.pipe(v.string(), v.minLength(5));
-export const DonationSchema = v.object({
-  id: v.number(),
-  name: NameSchema,
-});
-export type Donation = v.InferOutput<typeof DonationSchema>;
 
 export const FundationSchema = v.object({
   id: v.number(),
@@ -27,12 +22,12 @@ export const FundationSchema = v.object({
 });
 export type Fundation = v.InferOutput<typeof FundationSchema>;
 
-export const CausesSchema = v.object({
+export const DonationsSchema = v.object({
   id: v.number(),
   name: v.string(),
   description: v.string(),
 });
-export type Causes = v.InferOutput<typeof CausesSchema>;
+export type Donations = v.InferOutput<typeof DonationsSchema>;
 
 const ACTION = {
   CREATE_DONATION: "create-donation",
@@ -64,9 +59,9 @@ export async function action({ request }: ActionFunctionArgs) {
               },
             ],
             back_urls: {
-              success: "https://mydomain.com/success",
-              pending: "https://mydomain.com/pending",
-              failure: "https://mydomain.com/failure",
+              success: "https://test.com/success",
+              pending: "https://test.com/pending",
+              failure: "https://test.com/failure",
             },
             auto_return: "approved",
           }),
@@ -79,90 +74,84 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
-export async function loader() {
-  // const fundation = await fetchFundation();
-  // const causes = await fetchCauses();
-  // return { fundation, causes };
-  const data= await fetch("http://localhost:5173/test").then((response)=> response.json())
-  console.log("DATA",data)
-  return null
+export async function loader({}:LoaderFunctionArgs) {
+  const fundation = await fetchFundation();
+  const donations = await fetchDonations();
+  return { fundation, donations };
 }
 
 export default function () {
+  const { fundation, donations } = useLoaderData<typeof loader>();
   return (
-    <h1>HOLA</h1>
-  )
-  // const { fundation, causes } = useLoaderData<typeof loader>();
-  // return (
-  //   <>
-  //     <nav className="navbar">
-  //       <img
-  //         className="logo-kopius"
-  //         src="./assets/symbol_gradient.png"
-  //         alt="Logo Kopius"
-  //       />
-  //     </nav>
-  //     <div key={`fundation-${fundation.id}`} className="information">
-  //       <div className="header">
-  //         <img src="./assets/logo-small.png" alt="Logo Fundacion Si" />
-  //         <h1>{fundation.name}</h1>
-  //       </div>
-  //       <p>{fundation.description}</p>
-  //     </div>
-  //     <div className="causes">
-  //       {causes.map((data) => {
-  //         return (
-  //           <div key={`causes-${data.id}`} className="cause-item">
-  //             <b>{data.name}</b>
-  //             <p>{data.description}</p>
+    <>
+      <nav className="navbar">
+        <img
+          className="logo-kopius"
+          src="./assets/symbol_gradient.png"
+          alt="Logo Kopius"
+        />
+      </nav>
+      <div key={`fundation-${fundation.id}`} className="information">
+        <div className="header">
+          <img src="./assets/logo-small.png" alt="Logo Fundacion Si" />
+          <h1>{fundation.name}</h1>
+        </div>
+        <p>{fundation.description}</p>
+      </div>
+      <div className="causes">
+        {donations.map((data) => {
+          return (
+            <div key={`causes-${data.id}`} className="cause-item">
+              <b>{data.name}</b>
+              <p>{data.description}</p>
 
-  //             <div className="donation-form">
-  //               <Form method="POST">
-  //                 <input type="hidden" value={1000} name="amount" />
-  //                 <input type="hidden" value={data.name} name="cause" />
-  //                 <input type="hidden" value={ACTION.DONATE} name="action" />
-  //                 <button type="submit" className="button">
-  //                   $1000
-  //                 </button>
-  //               </Form>
+              <div className="donation-form">
+                <Form method="POST">
+                  <input type="hidden" value={1000} name="amount" />
+                  <input type="hidden" value={data.name} name="cause" />
+                  <input type="hidden" value={ACTION.DONATE} name="action" />
+                  <button type="submit" className="button">
+                    $1000
+                  </button>
+                </Form>
 
-  //               <Form method="POST">
-  //                 <input type="hidden" value={3000} name="amount" />
-  //                 <input type="hidden" value={data.name} name="cause" />
-  //                 <input type="hidden" value={ACTION.DONATE} name="action" />
-  //                 <button type="submit" className="button">
-  //                   $3000
-  //                 </button>
-  //               </Form>
+                <Form method="POST">
+                  <input type="hidden" value={3000} name="amount" />
+                  <input type="hidden" value={data.name} name="cause" />
+                  <input type="hidden" value={ACTION.DONATE} name="action" />
+                  <button type="submit" className="button">
+                    $3000
+                  </button>
+                </Form>
 
-  //               <Form method="POST">
-  //                 <input type="hidden" value={5000} name="amount" />
-  //                 <input type="hidden" value={data.name} name="cause" />
-  //                 <input type="hidden" value={ACTION.DONATE} name="action" />
-  //                 <button type="submit" className="button">
-  //                   $5000
-  //                 </button>
-  //               </Form>
+                <Form method="POST">
+                  <input type="hidden" value={5000} name="amount" />
+                  <input type="hidden" value={data.name} name="cause" />
+                  <input type="hidden" value={ACTION.DONATE} name="action" />
+                  <button type="submit" className="button">
+                    $5000
+                  </button>
+                </Form>
 
-  //               <Form method="POST">
-  //                 <input type="hidden" value={10000} name="amount" />
-  //                 <input type="hidden" value={data.name} name="cause" />
-  //                 <input type="hidden" value={ACTION.DONATE} name="action" />
-  //                 <button type="submit" className="button">
-  //                   $10.000
-  //                 </button>
-  //               </Form>
-  //             </div>
-  //           </div>
-  //         );
-  //       })}
-  //     </div>
-  //   </>
-  // );
+                <Form method="POST">
+                  <input type="hidden" value={10000} name="amount" />
+                  <input type="hidden" value={data.name} name="cause" />
+                  <input type="hidden" value={ACTION.DONATE} name="action" />
+                  <button type="submit" className="button">
+                    $10.000
+                  </button>
+                </Form>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
 }
 
 async function fetchFundation() {
-  return fetch("https://donations.com.ar/entity/1/get")
+  return fetch("http://localhost:5173/entity/1/get")
     .then((response) => {
       return response.json();
     })
@@ -172,13 +161,13 @@ async function fetchFundation() {
     });
 }
 
-async function fetchCauses() {
-  return fetch("https://donations.com.ar/entity/1/donations/get")
+async function fetchDonations() {
+  return fetch("http://localhost:5173/entity/1/donations/get")
     .then((response) => {
       return response.json();
     })
     .then((data) => {
-      const causes = v.parse(v.array(CausesSchema), data);
+      const causes = v.parse(v.array(DonationsSchema), data);
       return causes;
     });
 }

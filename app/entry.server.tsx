@@ -3,10 +3,10 @@ import { ServerRouter } from "react-router";
 import { isbot } from "isbot";
 import { renderToReadableStream } from "react-dom/server";
 
-if (process.env.NODE_ENV === 'development') {
-  const { server } = await import('~/mocks/node');
-  server.listen();
-}
+// if (process.env.NODE_ENV === 'development') {
+//   const { server } = await import('~/mocks/node');
+//   server.listen();
+// }
 
 export default async function handleRequest(
   request: Request,
