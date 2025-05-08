@@ -6,11 +6,9 @@ import {
   type LinksFunction,
   type LoaderFunctionArgs,
 } from "react-router";
-import { initMercadoPago } from "@mercadopago/sdk-react";
 import * as v from "valibot";
 import styles from "~/styles/global.css?url";
 
-initMercadoPago("TEST-c82e5505-3f42-4d4f-9b3d-f32246048daf");
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
