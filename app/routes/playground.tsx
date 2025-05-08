@@ -36,7 +36,6 @@ export type DonationOptions = v.InferOutput<typeof DonationOptionsSchema>;
 export type Entity = v.InferOutput<typeof EntitySchema>;
 
 const ACTION = {
-  CREATE_DONATION: "create-donation",
   PAY_DONATION: "pay_donation",
 } as const;
 
@@ -44,21 +43,6 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const action = formData.get("action");
   switch (action) {
-    case ACTION.CREATE_DONATION: {
-      const donation = await fetch("https://donations.com.ar/donation/create", {
-        method: "POST",
-        body: formData,
-      })
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          const donation = v.parse(DonationSchema, data);
-          return donation;
-        });
-      return donation;
-    }
-
     case ACTION.PAY_DONATION: {
       const amount = v.parse(
         v.pipe(
@@ -109,15 +93,13 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export async function loader() {
-  const donations = await fetchDonations();
   const donationOptions = await fetchDonationOptions();
   const entityDetails = await fetchEntityDetails();
-  return { donations, donationOptions, entityDetails };
+  return { donationOptions, entityDetails };
 }
 
 export default function () {
-  const { donations, donationOptions, entityDetails } =
-    useLoaderData<typeof loader>();
+  const { donationOptions, entityDetails } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   return (
     <body className="body container">
@@ -202,29 +184,6 @@ export default function () {
           );
         })}
       </ul>
-      <main className="main">
-        <ul className="donations-list">
-          {donations.map((donation) => {
-            return (
-              <li key={`donation-${donation.id}`} className="donation-item">
-                {donation.id}
-              </li>
-            );
-          })}
-        </ul>
-        <Form method="POST" className="create-donation-form">
-          <input type="hidden" name="action" value={ACTION.CREATE_DONATION} />
-          <input name="name" className="input-name" />
-          <button type="submit" className="create-button">
-            Create donation
-          </button>
-        </Form>
-        {actionData ? (
-          <span className="success-message">
-            Just created the donation {actionData.name}
-          </span>
-        ) : null}
-      </main>
     </body>
   );
 }
@@ -241,23 +200,12 @@ async function fetchEntityDetails() {
 }
 
 async function fetchDonationOptions() {
-  return fetch("https://donations.com.ar/entity/1/donations/get")
+  return fetch("http://localhost:5173/entity/1/donations/get")
     .then((response) => {
       return response.json();
     })
     .then((data) => {
       const donationOption = v.parse(v.array(DonationOptionsSchema), data);
       return donationOption;
-    });
-}
-
-async function fetchDonations() {
-  return fetch("https://donations.com.ar/donations")
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      const donations = v.parse(v.array(DonationSchema), data);
-      return donations;
     });
 }
