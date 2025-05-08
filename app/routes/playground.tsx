@@ -8,6 +8,8 @@ import {
 } from "react-router";
 import * as v from "valibot";
 import styles from "~/styles/global.css?url";
+import {fetchFundation} from "app/routes/entity.$id.get"
+import {fetchDonations} from "app/routes/entity.$id.donations.get"
 
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
@@ -57,9 +59,9 @@ export async function action({ request }: ActionFunctionArgs) {
               },
             ],
             back_urls: {
-              success: "https://test.com/success",
-              pending: "https://test.com/pending",
-              failure: "https://test.com/failure",
+              success: "https://donation-kopius.yaelpilarluque.workers.dev/success",
+              pending: "https://donation-kopius.yaelpilarluque.workers.dev/pending",
+              failure: "https://donation-kopius.yaelpilarluque.workers.dev/failure",
             },
             auto_return: "approved",
           }),
@@ -72,8 +74,9 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
-export async function loader({}:LoaderFunctionArgs) {
-  const fundation = await fetchFundation();
+export async function loader() {
+  const ENTENTY_ID= 1
+  const fundation = await fetchFundation(ENTENTY_ID);
   const donations = await fetchDonations();
   return { fundation, donations };
 }
@@ -148,27 +151,27 @@ export default function () {
   );
 }
 
-async function fetchFundation() {
-  return fetch("http://localhost:5173/entity/1/get")
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      const fundation = v.parse(FundationSchema, data);
-      return fundation;
-    });
-}
+// async function fetchFundation() {
+//   return fetch("http://localhost:5173/entity/1/get")
+//     .then((response) => {
+//       return response.json();
+//     })
+//     .then((data) => {
+//       const fundation = v.parse(FundationSchema, data);
+//       return fundation;
+//     });
+// }
 
-async function fetchDonations() {
-  return fetch("http://localhost:5173/entity/1/donations/get")
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      const causes = v.parse(v.array(DonationsSchema), data);
-      return causes;
-    });
-}
+// async function fetchDonations() {
+//   return fetch("http://localhost:5173/entity/1/donations/get")
+//     .then((response) => {
+//       return response.json();
+//     })
+//     .then((data) => {
+//       const causes = v.parse(v.array(DonationsSchema), data);
+//       return causes;
+//     });
+// }
 
 
 
