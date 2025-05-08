@@ -7,7 +7,8 @@ import {
   type LinksFunction,
 } from "react-router";
 import * as v from "valibot";
-
+import { fetchDonationOptions } from "app/routes/entity.$id.donations.get";
+import { fetchEntityDetails } from "app/routes/entity.$id.get";
 import stylesUrl from "../../src/styles.css?url";
 
 export const links: LinksFunction = () => [
@@ -15,6 +16,7 @@ export const links: LinksFunction = () => [
 ];
 
 export const EntitySchema = v.object({
+  id: v.number(),
   name: v.string(),
   description: v.string(),
 });
@@ -94,7 +96,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export async function loader() {
   const donationOptions = await fetchDonationOptions();
-  const entityDetails = await fetchEntityDetails();
+  const entityDetails = await fetchEntityDetails(1);
   return { donationOptions, entityDetails };
 }
 
@@ -188,24 +190,24 @@ export default function () {
   );
 }
 
-async function fetchEntityDetails() {
-  return fetch("http://localhost:5173/entity/1/get")
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      const entityDetails = v.parse(EntitySchema, data);
-      return entityDetails;
-    });
-}
+// async function fetchEntityDetails() {
+//   return fetch("http://localhost:5173/entity/1/get")
+//     .then((response) => {
+//       return response.json();
+//     })
+//     .then((data) => {
+//       const entityDetails = v.parse(EntitySchema, data);
+//       return entityDetails;
+//     });
+// }
 
-async function fetchDonationOptions() {
-  return fetch("http://localhost:5173/entity/1/donations/get")
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      const donationOption = v.parse(v.array(DonationOptionsSchema), data);
-      return donationOption;
-    });
-}
+// async function fetchDonationOptions() {
+//   return fetch("http://localhost:5173/entity/1/donations/get")
+//     .then((response) => {
+//       return response.json();
+//     })
+//     .then((data) => {
+//       const donationOption = v.parse(v.array(DonationOptionsSchema), data);
+//       return donationOption;
+//     });
+// }
