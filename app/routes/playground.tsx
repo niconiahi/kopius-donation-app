@@ -58,6 +58,7 @@ export async function action({ request }: ActionFunctionArgs) {
       const name = v.parse(v.string(), formData.get("name"));
       console.log("amount", amount);
       console.log("name", name);
+
       const mercadoPago = await fetch(
         "https://api.mercadopago.com/checkout/preferences",
         {
@@ -76,9 +77,12 @@ export async function action({ request }: ActionFunctionArgs) {
               },
             ],
             back_urls: {
-              success: "https://test.com/success",
-              pending: "https://test.com/pending",
-              failure: "https://test.com/failure",
+              success:
+                "https://react-router-app.fundacion-si.workers.dev/success",
+              pending:
+                "https://react-router-app.fundacion-si.workers.dev/pending",
+              failure:
+                "https://react-router-app.fundacion-si.workers.dev/failure",
             },
           }),
         },
@@ -107,7 +111,7 @@ export default function () {
     <body className="body container">
       <nav className="navbar">
         <img
-          src="public/assets/RGB_symbol gradient.png"
+          src="public/assets/symbol - standard gradient.png"
           alt="Logo de Kopius"
           className="logo navbar-logo"
         />
